@@ -98,3 +98,61 @@ func TestGetValueFromYaml(t *testing.T) {
 	assert.True(t, databaseShow)
 	assert.Equal(t, 3306, databasePort)
 }
+
+// reaf config from .env file
+func TestGetValueFromEnvFile(t *testing.T) {
+	config := viper.New()
+	config.SetConfigFile(".env")
+	config.AddConfigPath("./")
+
+	if err := config.ReadInConfig(); err != nil {
+		fmt.Println(err.Error())
+		t.Fail()
+		return
+	}
+
+	// get value from env file
+	appName := config.GetString("APP_NAME")
+	appVersion := config.GetString("APP_VERSION")
+	dbShow := config.GetBool("DB_SHOW")
+	dbHost := config.GetString("DB_HOST")
+	dbPort := config.GetInt("DB_PORT")
+
+	assert.Equal(t, "belajar golang viper", appName)
+	assert.Equal(t, "1.0.0", appVersion)
+	assert.True(t, dbShow)
+	assert.Equal(t, "localhost", dbHost)
+	assert.Equal(t, 3306, dbPort)
+}
+
+// environment variable sistem OS
+func TestEnvironmentVariable(t *testing.T) {
+	/**
+	kadang saat menjalankan aplikasi, kita menyimpan konfigurasi menggunakan enviroment variable yang terdapat di sistem OS yang kita gunakan
+	secara default Viper tidak akan membaca data dari environment variable
+	namun jika kita mau, kita bisa menggunakan method AutomaticEnv() untuk membaca dari environment variable
+	**/
+
+	config := viper.New()
+	config.AutomaticEnv()
+
+	// test env
+	hello := config.GetString("HELLO_ENV")
+
+	/**
+	set env variable windows menggunakan set HELLO_ENV=hello
+	set env variable mac menggunakan export HELLO_ENV=hello
+	**/
+
+	// test
+	assert.Equal(t, "hello", hello)
+}
+
+// fitur lainnya selain dari json, yaml, atau env file
+func TestFiturLainnya(t *testing.T) {
+	/**
+	sebenarnya Viper bisa digunakan untuk membaca jenis file konfigurasi lain, misal
+	- HCL (Hasicorp Configuration Language)
+	- Properties (Java Properties File)
+	**/
+}
